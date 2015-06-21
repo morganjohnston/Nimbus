@@ -198,6 +198,7 @@ namespace Nimbus.Infrastructure
                                            RequiresDuplicateDetection = false,
                                            SupportOrdering = false,
                                            AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                           EnablePartitioning = true,
                                        };
 
                 // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
@@ -298,6 +299,7 @@ namespace Nimbus.Infrastructure
                                            RequiresSession = false,
                                            SupportOrdering = false,
                                            AutoDeleteOnIdle = _autoDeleteOnIdle,
+                                           EnablePartitioning = true,
                                        };
 
                 // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
