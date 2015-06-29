@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure.Logging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusQueueMessageSender : BatchingMessageSender
+    internal class NimbusQueueMessageSender : INimbusMessageSender
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
@@ -13,21 +14,20 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private MessageSender _messageSender;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
-            : base()
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
             _logger = logger;
         }
 
-        protected override async Task SendBatch(BrokeredMessage[] toSend)
+        public async Task Send(BrokeredMessage toSend)
         {
             var messageSender = GetMessageSender();
 
-            _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _queuePath, toSend.Length);
+            _logger.LogDispatchAction("Calling SendAsync", _queuePath, toSend);
             try
             {
-                await messageSender.SendBatchAsync(toSend);
+                await messageSender.SendAsync(toSend);
             }
             catch (Exception)
             {
@@ -63,16 +63,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            try
-            {
-                DiscardMessageSender();
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            DiscardMessageSender();
         }
     }
 }
