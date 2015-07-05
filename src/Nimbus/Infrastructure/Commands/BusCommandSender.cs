@@ -97,6 +97,7 @@ namespace Nimbus.Infrastructure.Commands
                     await interceptor.OnCommandSendingError(busCommand, brokeredMessage, exception);
                 }
                 _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+                throw exception;
             }
         }
     }
